@@ -1,9 +1,0 @@
-DROP TABLE IF EXISTS posts;
-
-CREATE TABLE posts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    password_id TEXT NOT NULL,
-    text TEXT NOT NULL,
-    created_at DATETIME NOT NULL
-);
