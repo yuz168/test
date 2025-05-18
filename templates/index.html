@@ -1,134 +1,108 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>簡易掲示板</title>
+    <title>二次方程式とは?</title>
     <style>
-        body {
-            font-family: sans-serif;
-            margin: 20px;
-        }
-        h1 {
-            text-align: center;
-        }
-        #post-form {
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        #post-form label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        #post-form input[type="text"],
-        #post-form input[type="password"],
-        #post-form textarea {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            box-sizing: border-box;
-        }
-        #post-form button {
-            padding: 10px 15px;
-            background-color: #5cb85c;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        #posts {
-            margin-top: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 15px;
-        }
-        .post {
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
-        }
-        .post:last-child {
-            border-bottom: none;
-        }
-        .post-info {
-            font-size: 0.8em;
-            color: #777;
-            margin-bottom: 5px;
-        }
-        .error {
-            color: red;
-            margin-top: 10px;
+        .post-container {
+            border: 1px solid #ccc; /* 枠線のスタイル */
+            padding: 10px; /* 内側の余白 */
+            margin-bottom: 10px; /* 下の余白で投稿間を仕切る */
+            border-radius: 5px; /* 角を少し丸くする (任意) */
         }
     </style>
 </head>
 <body>
-    <h1>簡易掲示板</h1>
-
-    <div id="post-form">
-        <label for="name">名前:</label>
-        <input type="text" id="name" name="name" required>
-
-        <label for="password">パスワード:</label>
-        <input type="password" id="password" name="password" required>
-
-        <label for="text">投稿内容 (最大60文字):</label>
-        <textarea id="text" name="text" rows="3" required></textarea>
-
-        <button onclick="postMessage()">投稿</button>
-        <div id="error-message" class="error"></div>
-    </div>
-
+    <h1>supermochiBBS</h1>
+    <h2>supermochiBBSへようこそ!</h2>
+    <h4>この掲示板はsupermochiがテキトーにAIに作らせたものです。欠陥がいっぱいありますが気にしないでください</h4>
+    <form id="postForm">
+        <div>
+            <label for="name">名前：</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div>
+            <label for="password">パスワード：</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div>
+            <label for="text">投稿内容：</label>
+            <textarea id="text" name="text" rows="4" cols="50" required maxlength="140"></textarea>
+        </div>
+        <button type="submit">投稿</button>
+        <div id="post-error" style="color: red;"></div>
+    </form>
+    <hr>
     <h2>投稿一覧</h2>
-    <div id="posts">
-        {% if error %}
-            <p class="error">{{ error }}</p>
-        {% endif %}
+    <div id="post-list">
         {% for post in posts %}
-            <div class="post">
-                <div class="post-info">
-                    No.{{ post.id }} 名前: {{ post.name }} (ID: {{ post.password_id }}) - {{ post.created_at }}
-                </div>
-                <p>{{ post.text }}</p>
-            </div>
-        {% else %}
-            <p>まだ投稿はありません。</p>
+        <div class="post-container" data-post-id="{{ post.id }}">
+            投稿番号: {{ post.id }} (ID: {{ post.password_id }}) -
+            {{ post.created_at }} -
+            <strong>{{ post.name }}</strong>:<br>
+            {{ post.text }}
+        </div>
         {% endfor %}
     </div>
 
     <script>
-        async function postMessage() {
-            const name = document.getElementById('name').value;
-            const password = document.getElementById('password').value;
-            const text = document.getElementById('text').value;
-            const errorMessageDiv = document.getElementById('error-message');
+        document.addEventListener('DOMContentLoaded', function() {
+            const postForm = document.getElementById('postForm');
+            const postList = document.getElementById('post-list');
+            const postError = document.getElementById('post-error');
+            const nameInput = document.getElementById('name');
+            const passwordInput = document.getElementById('password');
+            const textInput = document.getElementById('text');
 
-            const formData = new FormData();
-            formData.append('name', name);
-            formData.append('password', password);
-            formData.append('text', text);
-
-            const response = await fetch('/post_async', {
-                method: 'POST',
-                body: formData
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                errorMessageDiv.textContent = '';
-                document.getElementById('name').value = '';
-                document.getElementById('password').value = '';
-                document.getElementById('text').value = '';
-                // 投稿成功したら投稿一覧をリロード
-                location.reload();
-            } else {
-                errorMessageDiv.textContent = data.error;
+            // LocalStorageから名前とパスワードを読み込んで入力欄に設定
+            const savedName = localStorage.getItem('name');
+            const savedPassword = localStorage.getItem('password');
+            if (savedName) {
+                nameInput.value = savedName;
             }
-        }
+            if (savedPassword) {
+                passwordInput.value = savedPassword;
+            }
+
+            postForm.addEventListener('submit', function(event) {
+                event.preventDefault(); // デフォルトのフォーム送信を阻止
+
+                const formData = new FormData(postForm);
+
+                fetch('/post_async', {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        postError.textContent = data.error;
+                    } else {
+                        postError.textContent = '';
+                        textInput.value = ''; // ← 投稿内容の入力欄をクリア
+                        // 新しい投稿を投稿一覧の先頭に追加
+                        const newPost = data.post;
+                        const newPostContainer = document.createElement('div');
+                        newPostContainer.classList.add('post-container');
+                        newPostContainer.dataset.postId = newPost.id;
+                        newPostContainer.innerHTML = `
+                            投稿番号: ${newPost.id} (ID: ${newPost.password_id}) -
+                            ${newPost.created_at} -
+                            <strong>${newPost.name}</strong>:<br>
+                            ${newPost.text}
+                        `;
+                        postList.insertBefore(newPostContainer, postList.firstChild);
+
+                        // 投稿成功時に LocalStorage に保存
+                        localStorage.setItem('name', nameInput.value);
+                        localStorage.setItem('password', passwordInput.value);
+                    }
+                })
+                .catch(error => {
+                    console.error('投稿エラー:', error);
+                    postError.textContent = '投稿に失敗しました。';
+                });
+            });
+        });
     </script>
 </body>
 </html>
