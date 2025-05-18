@@ -1,4 +1,4 @@
 Flask
 gunicorn
-pysqlite3
+pysqlite3==0.5.0  # 特定のバージョンを指定
 pytz
