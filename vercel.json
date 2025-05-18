@@ -4,7 +4,8 @@
       "src": "app.py",
       "use": "@vercel/python",
       "config": {
-        "requirements": "requirements.txt"
+        "requirements": "requirements.txt",
+        "installCommand": "apt-get update && apt-get install -y libsqlite3-dev"
       }
     }
   ],
