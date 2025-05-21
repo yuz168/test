@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>スレッド一覧</h2>
+    {% if threads %}
+        {% for thread in threads %}
+            <div class="thread-card">
+                <h3 class="thread-title"><a href="{{ url_for('thread_detail', thread_id=thread.id) }}">{{ thread.title }}</a></h3>
+                <p class="thread-meta">
+                    作成者: {{ users[thread.user_id] if users else '不明なユーザー' }} |
+                    作成日時: {{ thread.created_at.strftime('%Y-%m-%d %H:%M') }}
+                </p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>まだスレッドがありません。新しいスレッドを作成しましょう！</p>
+    {% endif %}
+{% endblock %}
