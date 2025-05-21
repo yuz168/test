@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>新しいスレッドを作成</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label for="title">スレッドタイトル:</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        <button type="submit" class="btn btn-primary">作成</button>
+    </form>
+{% endblock %}
