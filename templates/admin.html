@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>管理パネル</h2>
+    <h3>ユーザー管理</h3>
+    <ul class="user-list">
+        {% for user in users %}
+            <li>
+                <span>ユーザー名: {{ user.username }} (ロール: {{ user.role }})</span>
+                <div class="user-actions">
+                    {% if user.role == 'general' %}
+                        <form action="{{ url_for('promote_user', user_id=user.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-primary btn-small">モデレーターに昇格</button>
+                        </form>
+                    {% elif user.role == 'moderator' %}
+                        <form action="{{ url_for('demote_user', user_id=user.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-secondary btn-small">一般ユーザーに降格</button>
+                        </form>
+                    {% endif %}
+                    {% if user.role == 'admin' %}
+                        <span class="btn btn-small" style="background-color: #f0ad4e; color: white; cursor: default;">管理者</span>
+                    {% endif %}
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
