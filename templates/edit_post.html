@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>投稿を編集</h2>
+    <form action="{{ url_for('edit_post', post_id=post.id) }}" method="POST">
+        <div class="form-group">
+            <label for="content">コメント内容:</label>
+            <textarea id="content" name="content" rows="10" required>{{ post.content.text }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">更新</button>
+        <a href="{{ url_for('thread_detail', thread_id=post.thread.id) }}" class="btn btn-secondary">キャンセル</a>
+    </form>
+{% endblock %}
